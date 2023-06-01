@@ -68,7 +68,7 @@
           We selected our journals by analyzing genes with experimentally verified functions (e.g., TAIR).  Doing so allowed us to shortlist journals that 
           typically contain functional information of plant genes.
         </p>
-        <img src = "{{ url_for('static', filename = 'journals.png') }}" style = "max-width: 50%;" alt = "My Image">
+        <img class = 'question_img' src = "{{ url_for('static', filename = 'journals.png') }}" style = "max-width: 50%;" alt = "Statistics of journals analyzed">
         <br> <br>
         <p>
           For journals that aren't plant-specific (e.g., PNAS, Cell, etc.), we only processed papers that discussed plants.  Additionally, our database 
@@ -83,13 +83,13 @@
           The said KnowledgeNetwork viewer will display a handful of relationships found between your search query and the entities detected by GPT.  If you want to narrow
           down your search options, click on the "Layout Options" button:
         </p>
-        <img src="{{ url_for('static', filename='layoutoptions.png') }}" style="max-width: 50%;" alt="My Image">
+        <img class = 'question_img' src="{{ url_for('static', filename='layoutoptions.png') }}" style="max-width: 50%;" alt="My Image">
         <br> <br>
         <p>
           You can also choose to click on or double click on nodes to make unwanted nodes more transparent or to remove them.  You can restore nodes by clicking on 
           the background.  Right-clicking also removes clicked nodes.
         </p>
-        <img src="{{ url_for('static', filename='networkmethods.png') }}" style="max-width: 50%;" alt="My Image">
+        <img class = 'question_img' src="{{ url_for('static', filename='networkmethods.png') }}" style="max-width: 50%;" alt="My Image">
       </div>
     </li>
     <li class = "accordion-item" data-accordion-item>
@@ -99,7 +99,7 @@
           Yes.  Below the KnowledgeNetwork viewer, there is a table showcasing the network's nodes and edges.  Clicking on the Pubmed ID will reveal the 
           abstract and display the entities that were found from the abstract:
         </p>
-        <img class = 'align-center' src="{{ url_for('static', filename='abstractanalysis.png') }}" style="max-width: 50%;" alt="My Image"> 
+        <img class = 'question_img' src="{{ url_for('static', filename='abstractanalysis.png') }}" style="max-width: 50%;" alt="My Image"> 
       </div>
     </li>
     <li class = "accordion-item" data-accordion-item>
@@ -114,5 +114,10 @@
       </div>
     </li>
   </ul>
+
+  <!-- For the lightboxes: -->
+  <div class = 'light_box'>
+    <span class = 'close_button' onclick = 'close_light_box'> &times </span>
+  </div>
 </div>
 {% endblock %}
