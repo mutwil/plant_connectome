@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+/*document.addEventListener("DOMContentLoaded", function() {
     // Add click event listeners to all images
     var images = document.getElementsByTagName('img');
     for (var i = 0; i < images.length; i++) {
@@ -60,3 +60,33 @@ document.addEventListener("DOMContentLoaded", function() {
         document.body.style.overflow = 'auto';
         }
 });
+*/
+
+const images = document.querySelectorAll('img');
+const light_box = document.querySelector('.light_box');
+const close_button = document.querySelector('.close_button');
+
+const create_light_box = (img_node) => {
+    light_box.style.display = 'block';
+    let image_container = document.createElement('div');
+    let image = document.createElement('img')
+    image_container.setAttribute('class', 'light_box_container');
+    image.setAttribute('class', 'light_box_image');
+    image.setAttribute('src', img_node.src);
+
+    image_container.appendChild(image);
+    light_box.appendChild(image_container);
+}
+
+const close_light_box = () => {
+    let img = light_box.querySelector('.light_box_container');
+    light_box.style.display = 'none';
+    light_box.removeChild(img)
+}
+
+window.addEventListener('load', () => {
+    images.forEach(image => {image.addEventListener('click', () => {
+        create_light_box(image)
+    })});
+    close_button.addEventListener('click', close_light_box);
+})
