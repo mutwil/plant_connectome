@@ -58,7 +58,7 @@ def process_network(elements):
     else:
         return edgeConverter(elements)
 
-def generate_cytoscape_js(elements, ab, fa):
+def generate_cytoscape_js(elements):
     '''
     Generates nodes and edges to be displayed in the Cytoscape JS network.
     '''
