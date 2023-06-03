@@ -3,6 +3,7 @@ This module contains helper functions needed to generate the CytoscapeJS graph.
 '''
 import networkx as nx
 import json
+import pickle 
 
 def graphConverter(graph, ref):
     updatedElements = []
@@ -61,6 +62,10 @@ def generate_cytoscape_js(elements, ab, fa):
     '''
     Generates nodes and edges to be displayed in the Cytoscape JS network.
     '''
+    
+    ab = pickle.load(open('abbreviations', 'rb'))
+    fa = pickle.load(open('fa', 'rb'))
+    
     nodes = [
         "{ data: { id: '%s' } }" % node
         for node in set(edge["source"] for edge in elements) | set(edge["target"] for edge in elements)
