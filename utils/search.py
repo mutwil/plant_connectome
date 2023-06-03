@@ -121,7 +121,7 @@ def make_functional_annotations(gopredict, elements):
             fa[element[1]] = gopredict[element[1].upper()]
     return fa
     
-def generate_search_route(to_search, ab, fa, search_type):
+def generate_search_route(search_type):
     '''
     A function factory that generates a route to be used in the flask application.  
     The routes for the search form for genes, aliases, and other entities are all 
@@ -137,6 +137,10 @@ def generate_search_route(to_search, ab, fa, search_type):
             split_search = my_search.split(';')
             forSending = []
             elements = []
+  
+            to_search = pickle.load(open('allDic2', 'rb'))
+            ab = pickle.load(open('abbreviations', 'rb'))
+            fa = pickle.load(open('fa', 'rb'))
 
             for term in split_search:
                 results = find_terms(term, to_search, search_type)
