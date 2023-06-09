@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, url_for, redirect
-import requests
 
 # == IMPORTING THE ROUTES  ==
 from routes.author_search import author
