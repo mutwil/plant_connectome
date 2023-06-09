@@ -41,14 +41,14 @@
           </div>
         </label>
       </form>
-      <form action = "{{ url_for('form', form_type = 'author', search_type = 'author') }}", method = 'POST' id = 'name-form'>
+      <form action = "{{ url_for('form', form_type = 'author', search_type = 'author_search.author') }}", method = 'POST' id = 'name-form'>
         <label>
             ...author name (without special characters - for instance, accents).
             <input type = "text" placeholder = "e.g., Marek Mutwil (hit 'Enter' to search)" aria-describedby = "searchfield2" id = 'author' name = 'author'>
             <input type = "Submit" class = 'button' value = "Search!">
         </label>
       </form>
-      <form action = "{{ url_for('form', form_type = 'title', search_type = 'title') }}", method = 'POST' id = 'title-form'>
+      <form action = "{{ url_for('form', form_type = 'title', search_type = 'title_searches.title') }}", method = 'POST' id = 'title-form'>
         <label>
           ...by paper Pubmed ID (separated by commas).
           <input type = "text" placeholder = "e.g., 26503768 (hit 'Enter' to search)" aria-describedby = "searchfield3" id = 'title' name = 'title'>
