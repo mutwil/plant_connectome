@@ -127,9 +127,9 @@ def generate_search_route(search_type):
     The routes for the search form for genes, aliases, and other entities are all 
     virtually similar to one another - a function factory keeps things DRY.
     '''
-    def search_route():
+    def search_route(query):
         try:
-            my_search = request.form['gene_id']
+            my_search = query # request.form['gene_id']
         except:
             my_search = 'cesa'
         
@@ -167,7 +167,7 @@ def generate_search_route(search_type):
             
         if forSending != []:
             return render_template('gene.html', genes = forSending, cytoscape_js_code = cytoscape_js_code, 
-                                    search_term = my_search, number_papers = len(set(papers)), warning = warning, 
+                                    search_term = query, number_papers = len(set(papers)), warning = warning, 
                                     summary = summaryText, node_ab = elementsAb[my_search.upper()], node_fa = elementsFa[my_search.upper()])
         else:
             return render_template('not_found.html', search_term = my_search)
