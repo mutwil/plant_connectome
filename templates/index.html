@@ -28,27 +28,27 @@
   <div class = "grid-x grid-margin-x">
     <div class = "medium-6 cell small-order-1 medium-order-1">
       <h3> Search by... </h3>
-      <form action = '/normal' method = 'POST' id = 'gene-form'>
+      <form action = "{{ url_for('form', form_type = 'gene_id', search_type = 'normal') }}" method = 'POST' id = 'gene-form'>
         <label>
           ...gene, molecule, compartment, stress, cell type, organ, or any other related term.
           <input type = "text" placeholder = "e.g., CESA (hit 'Enter' to search)" aria-describedby = "searchfield1" id = "gene_id" name = 'gene_id'>
           <div class = "button-group">
             <input type = "Submit" class = 'button' value = "Word">
-            <input type = "Submit" class = 'button' formaction = '/exact' value = "Exact">
-            <input type = "Submit" class = 'button' formaction = '/alias' value = "Alias">
-            <input type = "Submit" class = 'button' formaction = '/substring' value = "Substring">
-            <input type = "Submit" class = 'button' formaction = '/non_alpha' value = "Non-alphanumeric">
+            <input type = "Submit" class = 'button' formaction = "{{ url_for('form', form_type = 'gene_id', search_type = 'exact') }}" value = "Exact">
+            <input type = "Submit" class = 'button' formaction = "{{ url_for('form', form_type = 'gene_id', search_type = 'alias') }}" value = "Alias">
+            <input type = "Submit" class = 'button' formaction = "{{ url_for('form', form_type = 'gene_id', search_type = 'substring') }}" value = "Substring">
+            <input type = "Submit" class = 'button' formaction = "{{ url_for('form', form_type = 'gene_id', search_type = 'non_alpha') }}" value = "Non-alphanumeric">
           </div>
         </label>
       </form>
-      <form action = '/author', method = 'POST' id = 'name-form'>
+      <form action = "{{ url_for('form', form_type = 'author', search_type = 'author') }}", method = 'POST' id = 'name-form'>
         <label>
             ...author name (without special characters - for instance, accents).
             <input type = "text" placeholder = "e.g., Marek Mutwil (hit 'Enter' to search)" aria-describedby = "searchfield2" id = 'author' name = 'author'>
             <input type = "Submit" class = 'button' value = "Search!">
         </label>
       </form>
-      <form action = '/title', method = 'POST' id = 'title-form'>
+      <form action = "{{ url_for('form', form_type = 'title', search_type = 'title') }}", method = 'POST' id = 'title-form'>
         <label>
           ...by paper Pubmed ID (separated by commas).
           <input type = "text" placeholder = "e.g., 26503768 (hit 'Enter' to search)" aria-describedby = "searchfield3" id = 'title' name = 'title'>
