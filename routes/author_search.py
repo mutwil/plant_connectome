@@ -1,7 +1,7 @@
 '''
 This module contains the route(s) needed to search based on an author's name.
 '''
-from flask import render_template #, Blueprint
+from flask import render_template, Blueprint
 import pickle 
 from Bio import Entrez
 import sys
@@ -14,9 +14,9 @@ from utils.search import Gene, make_abbreviations, make_functional_annotations
 from utils.cytoscape import process_network, generate_cytoscape_js
 from utils.text import make_text
 
-# author_search = Blueprint('author_search', __name__)
+author_search = Blueprint('author_search', __name__)
 
-# @author_search.route('/author/<query>', methods = ['GET'])
+@author_search.route('/author/<query>', methods = ['GET'])
 def author(query):
     try:
         my_search = query.lower()

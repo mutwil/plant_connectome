@@ -13,6 +13,10 @@ from utils.search import Gene, make_abbreviations, make_functional_annotations
 from utils.cytoscape import process_network, generate_cytoscape_js
 from utils.text import make_text
 
+# -- Making Blueprint for title search route:
+title_searches = Blueprint('title_searches', __name__)
+
+@title_searches.route('/title/<query>', methods = ['GET'])
 def title(query):
     try: 
         my_search = query.lower()
