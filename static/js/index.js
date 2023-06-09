@@ -36,7 +36,7 @@ const gene_form_listeners = () => {
 // Methods for submitting the gene form via buttons:
 function submitGeneForm(event, form, path) {
     if (titleInput.value === "") {
-        if (path === '/alias') {
+        if (path === '/form/gene_id/alias') {
             titleInput.value = 'CESA1';
         } else {
             titleInput.value = 'CESA';
