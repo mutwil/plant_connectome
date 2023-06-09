@@ -13,12 +13,9 @@ from utils.search import Gene, make_abbreviations, make_functional_annotations
 from utils.cytoscape import process_network, generate_cytoscape_js
 from utils.text import make_text
 
-title_searches = Blueprint('title_searches', __name__)
-
-@title_searches.route('/title', methods = ['POST'])
-def title_search():
+def title(query):
     try: 
-        my_search = request.form['title'].lower()
+        my_search = query.lower()
     except: 
         my_search = '26503768'
     pmids = []
@@ -49,7 +46,7 @@ def title_search():
                         break
     if forSending!=[]:
         elements = list(set(elements))
-        fa, ab = pickle.load(open('fa', 'rb')), pickle.load(open('abbreviations', 'rb'))
+        fa, ab = pickle.load(open('fa', 'rb'))[0], pickle.load(open('abbreviations', 'rb'))[0]
         elementsAb, elementsFa = make_abbreviations(ab, elements), make_functional_annotations(fa, elements)
 
         updatedElements = process_network(elements)

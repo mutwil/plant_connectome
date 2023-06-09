@@ -45,7 +45,7 @@ def similarity():
         
         print(forSending)
 
-        return render_template('/similarity.html', results = forSending, search_term = my_search, number_nodes = len(forSending), number_papers = len(unique_papers), type = typa)
+        return render_template('similarity.html', results = forSending, search_term = my_search, number_nodes = len(forSending), number_papers = len(unique_papers), type = typa)
 
     else:
         return render_template('not_found.html', search_term = my_search)

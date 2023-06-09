@@ -1,7 +1,7 @@
 '''
 This module contains the route(s) needed to search based on an author's name.
 '''
-from flask import Blueprint, request, render_template
+from flask import render_template #, Blueprint
 import pickle 
 from Bio import Entrez
 import sys
@@ -14,12 +14,12 @@ from utils.search import Gene, make_abbreviations, make_functional_annotations
 from utils.cytoscape import process_network, generate_cytoscape_js
 from utils.text import make_text
 
-author_search = Blueprint('author_search', __name__)
+# author_search = Blueprint('author_search', __name__)
 
-@author_search.route('/author', methods = ['POST'])
-def author():
+# @author_search.route('/author/<query>', methods = ['GET'])
+def author(query):
     try:
-        my_search = request.form["author"].lower()
+        my_search = query.lower()
         replacements = {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss", "é": "e", "ô": "o", "î": "i", "ç": "c"}
         my_search = ''.join(replacements.get(c, c) for c in my_search)
     except:
@@ -62,7 +62,7 @@ def author():
                         break
     if forSending != []:
         elements = list(set(elements))
-        fa, ab = pickle.load(open('fa', 'rb')), pickle.load(open('abbreviations', 'rb'))
+        fa, ab = pickle.load(open('fa', 'rb'))[0], pickle.load(open('abbreviations', 'rb'))[0]
         elementsAb, elementsFa = make_abbreviations(ab, elements), make_functional_annotations(fa, elements)
         
         updatedElements = process_network(elements)
@@ -74,7 +74,7 @@ def author():
             warning = 'The network might be too large to be displayed, so click on "Layout Options", select the edge types that you are interested in and click "Recalculate layout".'
 
         return render_template('author.html', genes = forSending, cytoscape_js_code = cytoscape_js_code, 
-                               ncbi_count = count, author = my_search, connectome_count = len(set(papers)), 
+                               ncbi_count = count, author = query, connectome_count = len(set(papers)), 
                                warning = warning, summary = summaryText)
     else:
         return render_template('not_found.html', search_term = my_search)
