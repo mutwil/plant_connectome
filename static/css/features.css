@@ -1,6 +1,4 @@
 #piechart {
-    width: 600px;
-    height: 2000px;
     margin: 0 auto;
     padding: 10px 20px;
     border: 1px solid #ccc;
@@ -11,4 +9,12 @@
 
 .chart-title {
     text-align: center;
+}
+
+.card {
+    transition: box-shadow 0.5s;
+}
+
+.card:hover {
+    box-shadow: 5px 5px 5px;
 }

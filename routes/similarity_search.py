@@ -1,5 +1,5 @@
 '''
-This module contains the routes for searching.
+This module contains the routes for similarity search.
 '''
 from flask import Blueprint, request, render_template
 import pickle
@@ -9,7 +9,6 @@ import sys
 
 # -- Setting up the utils path module -- 
 sys.path.append('utils')
-
 
 similarity_search = Blueprint('similarity_search', __name__)
 
@@ -42,10 +41,9 @@ def similarity():
             for v in i[1]:
                 if v not in unique_papers:
                     unique_papers.append(v)
-        
-        print(forSending)
-
+       
         return render_template('similarity.html', results = forSending, search_term = my_search, number_nodes = len(forSending), number_papers = len(unique_papers), type = typa)
+
 
     else:
         return render_template('not_found.html', search_term = my_search)

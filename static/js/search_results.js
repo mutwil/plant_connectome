@@ -80,7 +80,7 @@ function downloadAsSVG() {
     // Modify the downloaded SVG to have black letters
     const svgDOM = new DOMParser().parseFromString(svgContent, 'image/svg+xml');
     const labels = svgDOM.querySelectorAll('text');
-    labels.forEach(label => label.setAttribute('fill', '#00FF00'));
+    labels.forEach(label => label.setAttribute('fill', '#000000'));
     const modifiedSvgContent = new XMLSerializer().serializeToString(svgDOM);
 
     // Create a Blob from the SVG content

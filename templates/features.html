@@ -10,19 +10,122 @@
 {% endblock %}
 
 {% block content %}
-<div class = "grid-container fluid">
+<div class = "grid-container">
     <br>
-    <h2> Features of our Database </h2>
-    <br>
-    <p> This page list several features that PlantConnectome has. </p>
+    <div class = 'text-center'>
+        <br>
+        <h1> Features of our Database </h1>
+        <br>
+        <p> Learn more about PlantConnectome and what it has to offer here! </p>
+        <br>
+    </div>
     <hr>
-    <h3> Processed Papers and Abstracts </h3>
-    <canvas id = "piechart" style = "width: 50%; height: 50%;"> </canvas>
-    <script> {{ piechart_code | safe }} </script>
+    <h2> Composition of PlantConnectome </h2>
     <br>
-    <p> We have surveyed numerous sources to construct our database. </p>
+    <div class = 'grid-x grid-margin-x'>
+        <div class = 'cell medium-6'>
+            We have surveyed numerous sources to construct our database, all of which are shown on the pie chart to the right.
+            <br> <br>
+            This database was constructed using over 100,000 different research paper abstracts on plants.  Over 350,000 different entities
+            were identified using GPT.  
+            <br> <br>
+            For each research paper abstract, GPT was tasked to identify relationships between the abstract's various entities. 
+        </div>
+        <div class = 'cell medium-6'>
+            <canvas id = "piechart" width = '550' height = '200'> </canvas>
+            <script> {{ piechart_code | safe }} </script>
+        </div>
+    </div>
+    <br>
     <hr>
-    <h3> Future Suggestions </h3>
-    <p> Have any feedback?  Feel free to reach out to us! </p>
+    <div class = 'text-center'>
+        <h2> Searching PlantConnectome </h2>
+        <p> PlantConnectome offers five different kinds of searches: </p>
+        <br>
+    </div>
+    <div class = 'grid-x grid-margin-x medium-up-3'>
+        <div class = 'cell'>
+            <div class = 'card'>
+                <div class = 'card-divider'>
+                    <strong> Term Searches </strong>
+                </div>
+                <div class = 'card-section'>
+                    <p>
+                        Search for entities in our database by a specific keyword or phrase using this option!  Users can also search for 
+                        aliases, exact matches, sub-strings, and non-alphanumeric results.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class = 'cell'>
+            <div class = 'card'>
+                <div class = 'card-divider'>
+                    <strong> Author Search </strong>
+                </div>
+                <div class = 'card-section'>
+                    <p>
+                        Search for entities in our database using authors' names!
+                    </p>
+                </div>            
+            </div>
+        </div>
+        <div class = 'cell'>
+            <div class = 'card'>
+                <div class = 'card-divider'>
+                    <strong> Pubmed ID Search </strong>
+                </div>
+                <div class = 'card-section'>
+                    Search for entities in our database using the Pubmed IDs of papers!
+                </div>            
+            </div>
+        </div>
+    </div>
+    <br>
+    <hr>
+    <div class = 'text-center'>
+        <h2> Search Results </h2>
+        <p> All search results with hits in PlantConnectome will return three items: </p>
+        <br>
+    </div>
+    <div class = 'grid-x grid-margin-x medium-up-3'>
+        <div class = 'cell'>
+            <div class = 'card'>
+                <div class = 'card-divider'>
+                    <strong> Entity Relationship Graph </strong>
+                </div>
+                <img src = '../static/Capture.PNG' alt = "A sample entity-relationship graph">
+                <div class = 'card-section'>
+                    <p>
+                        Search for entities in our database by a specific keyword or phrase using this option!  Users can also search for 
+                        aliases, exact matches, sub-strings, and non-alphanumeric results.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class = 'cell'>
+            <div class = 'card'>
+                <div class = 'card-divider'>
+                    <strong> Text Summary </strong>
+                </div>
+                <img src = '../static/text-summary.png' alt = "Text-summary of search results">
+                <div class = 'card-section'>
+                    <p>
+                        Search for entities in our database using authors' names!
+                    </p>
+                </div>            
+            </div>
+        </div>
+        <div class = 'cell'>
+            <div class = 'card'>
+                <div class = 'card-divider'>
+                    <strong> Entity Relationship Table </strong>
+                </div>
+                <img src = '../static/table.png' alt = "A sample entity-relationship graph">
+                <div class = 'card-section'>
+                    Search for entities in our database using the Pubmed IDs of papers!
+                </div>            
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

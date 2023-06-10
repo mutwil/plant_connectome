@@ -21,12 +21,24 @@ var myChart = new Chart(ctx, {
     ],
   },
     options: {
-    title: {
-		display: true,
-		text: "Processed journals and abstracts",
-		fontSize: 18,
-		position: "top",
-		padding: 0,
-    },
-  },
-});
+      aspectRatio: 2,
+      maintainAspectRatio: false,
+      title: {
+        display: true,
+        text: "Processed journals and abstracts",
+        fontSize: 18,
+        padding: 0,
+      },
+      plugins: {
+        legend: {
+          position: 'right',
+          align: 'start',
+          labels: {
+            padding: 6,
+            boxWidth: 7
+          }
+        }
+      }
+    }
+  }
+);

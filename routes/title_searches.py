@@ -57,6 +57,6 @@ def title(query):
         cytoscape_js_code = generate_cytoscape_js(updatedElements, elementsAb, elementsFa)
         summaryText = make_text(forSending)
         return render_template('gene.html', genes = forSending, cytoscape_js_code = cytoscape_js_code, 
-                               number_papers = len(hits), search_term = my_search, summary = summaryText)
+                               number_papers = len(hits), search_term = my_search, summary = summaryText, is_node = False)
     else:
         return render_template('not_found.html', search_term = my_search)

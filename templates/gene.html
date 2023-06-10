@@ -28,14 +28,9 @@
   </div>
   {% endif %}
   <h2> Search results for: {{ search_term }} <small> ({{ number_papers }} paper(s) in our database) </small> </h2>
-  <form id = "node-search-form">
-    <input type = "text" id = "node-search" name = "node-search" placeholder = "Search a node by its name" />
-    <button class = "button primary" type = "submit"> Submit </button>
-    <button class = "button success" onclick = "window.location.href = '{{ url_for('index') }}'"> Go back </button>
-    <button class = "button success" id = "download-pdf"> Download as SVG </button>
-    <button class = "button success" onclick = "downloadTableAsTSV('table_id', 'table.tsv')"> Download complete network as TSV </button>
-	</form>
-  <div id = "nodeSummary">
+
+  {% if is_node %}
+  <div id="nodeSummary">
     <p> <span class='lead'> Node summary of {{ search_term }}: </span> </p>
     <label> <span style="font-weight: bold">Abbreviations: </span></label>
     <p>
@@ -52,6 +47,16 @@
     </p>
     <br>
   </div>
+  {% endif %}
+
+  <form id = "node-search-form">
+    <input type = "text" id = "node-search" name = "node-search" placeholder = "Search a node by its name" />
+    <button class = "button primary" type = "submit"> Submit </button>
+    <button class = "button success" onclick = "window.location.href = '{{ url_for('index') }}'"> Go back </button>
+    <button class = "button success" id = "download-pdf"> Download as SVG </button>
+    <button class = "button success" onclick = "downloadTableAsTSV('table_id', 'table.tsv')"> Download complete network as TSV </button>
+	</form>
+
 
   <form action='/normal' method='POST' id='gene-form' style="display: none;">
     <input type="text" aria-describedby="searchfield1" id="gene_id" name='gene_id' style="display: none;">
