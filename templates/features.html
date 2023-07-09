@@ -44,10 +44,10 @@
     <div class = 'grid-x grid-margin-x medium-up-3'>
         <div class = 'cell'>
             <div class = 'card'>
-                <div class = 'card-divider' style="display: flex; justify-content: center;">
+                <div class = 'card-divider' style = "display: flex; justify-content: center;">
                     <strong> Term Searches </strong>
                 </div>
-                <div class = 'card-section' style= "text-align: left;">
+                <div class = 'card-section' style = "text-align: left;">
                     <p>
                         Search by keywords and gene IDs:
                         <ul style= "text-align: left;">
@@ -61,10 +61,10 @@
         </div>
         <div class = 'cell'>
             <div class = 'card'>
-                <div class = 'card-divider' style="display: flex; justify-content: center;">
+                <div class = 'card-divider' style = "display: flex; justify-content: center;">
                     <strong> Author Search </strong>
                 </div>
-                <div class = 'card-section' style= "text-align: center;">
+                <div class = 'card-section' style = "text-align: center;">
                     <p>
                         Finds and displays publications by author.
                     </p>
@@ -73,10 +73,10 @@
         </div>
         <div class = 'cell'>
             <div class = 'card'>
-                <div class = 'card-divider' style="display: flex; justify-content: center;">
+                <div class = 'card-divider' style = "display: flex; justify-content: center;">
                     <strong> Pubmed ID Search </strong>
                 </div>
-                <div class = 'card-section' style= "text-align: center;">
+                <div class = 'card-section' style = "text-align: center;">
                     Displays publications of interest by Pubmed ID.
                 </div>            
             </div>
@@ -92,11 +92,11 @@
     <div class = 'grid-x grid-margin-x medium-up-3'>
         <div class = 'cell'>
             <div class = 'card'>
-                <div class = 'card-divider' style="display: flex; justify-content: center;">
+                <div class = 'card-divider' style = "display: flex; justify-content: center;">
                     <strong> Number of Papers  </strong>
                 </div>
-                <img src = "{{ url_for('static', filename = '/num_papers.png') }}" alt = "A sample entity-relationship graph">
-                <div class = 'card-section' style= "text-align: left;">
+                <img src = "{{ url_for('static', filename = 'pics/num_papers.png') }}" alt = "A sample entity-relationship graph">
+                <div class = 'card-section' style = "text-align: left;">
                     <p>
                         The number of abstracts in the database containing the search query is 
                         shown for reference.
@@ -106,10 +106,10 @@
         </div>
         <div class = 'cell'>
             <div class = 'card'>
-                <div class = 'card-divider' style="display: flex; justify-content: center;">
+                <div class = 'card-divider' style = "display: flex; justify-content: center;">
                     <strong> Functional Annotations  </strong>
                 </div>
-                <img src = "{{ url_for('static', filename = '/functional_annotations.png') }}" alt = "A sample entity-relationship graph">
+                <img src = "{{ url_for('static', filename = 'pics/functional_annotations.png') }}" alt = "A sample entity-relationship graph">
                 <div class = 'card-section' style= "text-align: left;">
                     <p>
                         A collection of functions associated with the search query is displayed.
@@ -119,10 +119,10 @@
         </div>
         <div class = 'cell'>
             <div class = 'card'>
-                <div class = 'card-divider' style="display: flex; justify-content: center;">
+                <div class = 'card-divider' style = "display: flex; justify-content: center;">
                     <strong> Abbreviations  </strong>
                 </div>
-                <img src = "{{ url_for('static', filename = '/abbrs.png') }}" alt = "A sample entity-relationship graph">
+                <img src = "{{ url_for('static', filename = 'pics/abbrs.png') }}" alt = "A sample entity-relationship graph">
                 <div class = 'card-section' style= "text-align: left;">
                     <p>
                         A collection of abbreviations associated with the search query is displayed.
@@ -132,11 +132,11 @@
         </div>
         <div class = 'cell'>
             <div class = 'card'>
-                <div class = 'card-divider' style="display: flex; justify-content: center;">
+                <div class = 'card-divider' style = "display: flex; justify-content: center;">
                     <strong> Entity Relationship Graph </strong>
                 </div>
-                <img src = '../static/Capture.PNG' alt = "A sample entity-relationship graph">
-                <div class = 'card-section' style= "text-align: left; overflow: scroll;">
+                <img src = "{{ url_for('static', filename = 'pics/Capture.PNG') }}" alt = "A sample entity-relationship graph">
+                <div class = 'card-section' style = "text-align: left; overflow: scroll;">
                     <p>
                         This directed graph summarizes the various entities in the database sharing relationships with the search query. Each circle (i.e., node) and arrow (i.e., edge) on the graph represents an entity and a relationship shared between two entities, respectively.
                         <br> <br>
@@ -147,10 +147,10 @@
         </div>
         <div class = 'cell'>
             <div class = 'card'>
-                <div class = 'card-divider' style="display: flex; justify-content: center;">
+                <div class = 'card-divider' style = "display: flex; justify-content: center;">
                     <strong> Text Summary </strong>
                 </div>
-                <img src = '../static/text-summary.png' alt = "Text-summary of search results">
+                <img src = "{{ url_for('static', filename = 'pics/text-summary.png') }}" alt = "Text-summary of search results">
                 <div class = 'card-section' style= "text-align: left;">
                     <p>
                         A text summary of the entity-relationship graph is shown for reference, where each paragraph corresponds to a separate cluster of nodes.
@@ -160,10 +160,10 @@
         </div>
         <div class = 'cell'>
             <div class = 'card'>
-                <div class = 'card-divider' style="display: flex; justify-content: center;">
+                <div class = 'card-divider' style = "display: flex; justify-content: center;">
                     <strong> Entity Relationship Table </strong>
                 </div>
-                <img src = '../static/table.png' alt = "A sample entity-relationship graph">
+                <img src = "{{ url_for('static', filename = 'pics/table.png') }}" alt = "A sample entity-relationship graph">
                 <div class = 'card-section' style= "text-align: left;">
                     A table summary of the node-edge interactions in the Knowledge Network graph is also shown, which is fully sortable, downloadable as a TSV file, and has hyperlinked Pubmed IDs.
                 </div>            

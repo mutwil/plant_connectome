@@ -15,12 +15,6 @@
   <p> General Questions & Answers </p>
   <hr>
 
-  <style>
-    .accordion-title{
-      font-size:1rem;
-    }
-  </style>
-
   <!-- Questions as accordions -->
   <ul class = "accordion" data-accordion data-allow-all-closed = 'true'>
     <li class = "accordion-item" data-accordion-item>
@@ -69,68 +63,47 @@
         <p>
           To ensure PlantConnectome reflects state-of-the-art knowledge, all research papers from which it derives were published <strong>after 2004</strong>. All articles from plant journals were downloaded, whereas non-plant-specific journals (e.g., PNAS, Cell, etc.) were harvested only for their publications examining plants.
         </p>
-        <img src = "{{ url_for('static', filename = 'article.png') }}" style = "max-width: 50%;" alt = "My Image">
+        <img src = "{{ url_for('static', filename = 'pics/article.png') }}" style = "max-width: 50%;" alt = "">
       </div>
     </li>
     <li class = "accordion-item" data-accordion-item>
       <a class = "accordion-title"> How do I use the KnowledgeNetwork viewer?  </a>
-
-      <style>
-        .image-container {
-          display: flex;
-          flex-direction: column;
-          text-align: center;
-          margin: 1rem;
-        }
-        
-        .image-container img {
-          display: block;
-          align-items: center;
-          width: 50%;
-        }
-        
-        .image-container p {
-          margin-top: 10px; 
-        }
-      </style>
-      
       <div class = "accordion-content" data-tab-content>
       <div class = "image-container">
-
         <div>
-        <p>
-          Our KnowledgeNetwork viewer displays a plethora of relationships found between your search query and GPT-detected entities. Should you want to narrow your search options, click on the "Layout Options" button:
-        </p>
-        <img src="../static/First_GIF.gif" alt="First_GIF">
+          <p>
+            Our KnowledgeNetwork viewer displays a plethora of relationships found between your search query and GPT-detected entities. Should you want to narrow your search options, click on the "Layout Options" button:
+          </p>
+          <img class = 'image-container' src = "{{ url_for('static', filename = 'pics/First_GIF.gif') }}" alt = "First_GIF">
         </div>
         <br>
         <div>
-        <p>
-          Then, select your edges of interest and click "Recalculate Layout":
-        </p>
-        <img src="../static/Second_GIF.gif" alt="Second_GIF">
+          <p>
+            Then, select your edges of interest and click "Recalculate Layout":
+          </p>
+          <img class = 'image-container' src = "{{ url_for('static', filename = 'pics/Second_GIF.gif') }}" alt = "Second_GIF">
         </div>
         <br>
         <div>
-        <p>
-          To learn more about a specific node, click on it:
-        </p>
-        <img src="../static/Node_info.gif" alt="Third_GIF">
+          <p>
+            To learn more about a specific node, click on it:
+          </p>
+          <img class = 'image-container' src = "{{ url_for('static', filename = 'pics/Node_info.gif') }}" alt = "How to">
         </div>
         <br>
         <div>
-        <p>
-          Users also have the option of personally modifying networks. For example, among the list of possible actions when clicking a node is removing it. Clicking once on the background will restore node opacity, while clicking twice will reincorporate the removed node. 
-        </p>
-        <img src="../static/Remove_node.gif" alt="Fourth_GIF">
+          <p>
+            Users also have the option of personally modifying networks. For example, among the list of possible actions when clicking a node is removing it. Clicking once on the background will restore node opacity, while clicking twice will reincorporate the removed node. 
+          </p>
+          <img class = 'image-container' src = "{{ url_for('static', filename = 'pics/Remove_node.gif') }}" alt = "Fourth_GIF">
         </div>
         <br>
         <div>
-          To isolate a neighborhood of entities, select your node of interest and click "Isolate Neighborhood." Double-clicking on the background will restore the full, original network. 
-        </p>
-        <img src="../static/Neighbourhood.GIF" alt="Fifth_GIF">
+          <p>
+            To isolate a neighborhood of entities, select your node of interest and click "Isolate Neighborhood." Double-clicking on the background will restore the full, original network. 
+          </p>
+          <img class = 'image-container' src = "{{ url_for('static', filename = 'pics/Neighbourhood.gif') }}" alt = "Fifth_GIF">
         </div>
-          
       </div>
       </div>
     </li>
@@ -141,55 +114,29 @@
           Below the KnowledgeNetwork viewer is a table showcasing the network's nodes and edges. Clicking on the Pubmed ID will display both the 
           research abstract and entities identified from it:
         </p>
-        <img class = 'align-center' src="{{ url_for('static', filename='abstractanalysis.png') }}" style="max-width: 50%;" alt="My Image"> 
+        <img class = 'align-center' src = "{{ url_for('static', filename = 'pics/abstractanalysis.png') }}" style = "max-width: 50%;" alt="My Image"> 
       </div>
     </li>
     <li class = "accordion-item" data-accordion-item>
-
-  <a class = "accordion-title"> How accurate is GPT in extracting information from the literature?  </a>
-  <div class = "accordion-content" data-tab-content>
-    <style>
-      .image-cont {
-        text-align: center;
-        display: inline-block;
-      }
-
-      .image-cont img {
-          display: block;
-          align-items: center;
-          width: 50%;
-        }
-        
-
-        .image-caption{
-            font-size: 0.75rem;
-            color:grey;
-        }
-    
-    </style>
-
-<div class="image-cont">
-
-  <div>
-    <p>
-      As with any AI model, GPT is not 100% accurate, generating results that may be erroneous or incomplete. Accordingly, relationships of interest warrant confirmation with the appropriate abstract. To estimate the accuracy rate, we sampled and manually inspected 50 articles,
-      the results of which are summarized by the following 3 charts:
-    </p>
-  </div>
-
-  <div>
-    <img src="../static/chart.png" alt="first_chart">
-    <p class="image-caption"> Distribution of correct, incorrect, and missing statements detected by GPT. </p>
-  </div>
-
-  <div>
-    <img src="../static/chart2.png" alt="second_chart">
-    <p class="image-caption"> Total number of correct, incorrect, and missing statements extracted from the 50 articles. </p>
-  </div>
-
-  </div>
-</div>
-        
+      <a class = "accordion-title"> How accurate is GPT in extracting information from the literature?  </a>
+      <div class = "accordion-content" data-tab-content>
+        <div class = "image-cont"> 
+          <div>
+            <p>
+              As with any AI model, GPT is not 100% accurate, generating results that may be erroneous or incomplete. Accordingly, relationships of interest warrant confirmation with the appropriate abstract. To estimate the accuracy rate, we sampled and manually inspected 50 articles,
+              the results of which are summarized by the following 3 charts:
+            </p>
+          </div>
+          <div>
+            <img src = "{{ url_for('static', filename = 'pics/chart.png') }}" alt = "first_chart">
+            <p class = "image-caption"> Distribution of correct, incorrect, and missing statements detected by GPT. </p>
+          </div>
+          <div>
+            <img src = "{{ url_for('static', filename = 'pics/chart2.png') }}" alt = "second_chart">
+            <p class = "image-caption"> Total number of correct, incorrect, and missing statements extracted from the 50 articles. </p>
+          </div>
+        </div>
+      </div>
     </li>
   </ul>
 </div>
