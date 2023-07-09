@@ -67,7 +67,7 @@ def find_terms(my_search, genes, search_type):
             if my_search.upper().strip() == i.strip():
                 elements, forSending = find_terms_helper(i, genes)
     elif search_type == 'alias':
-        with open('geneAlias', 'rb') as file:
+        with open('dbs/geneAlias', 'rb') as file:
             adjMat = pickle.load(file)
         try:
             terms = adjMat[my_search.upper().strip()]
@@ -139,9 +139,9 @@ def generate_search_route(search_type):
             split_search = my_search.split(';')
             elements = []
   
-            to_search = pickle.load(open('allDic2', 'rb'))
-            ab = pickle.load(open('abbreviations', 'rb'))[0]
-            fa = pickle.load(open('fa', 'rb'))[0]
+            to_search = pickle.load(open('dbs/allDic2', 'rb'))
+            ab = pickle.load(open('dbs/abbreviations', 'rb'))[0]
+            fa = pickle.load(open('dbs/fa', 'rb'))[0]
 
             for term in split_search:
                 results = find_terms(term, to_search, search_type)

@@ -76,7 +76,7 @@ def generate_cytoscape_js(elements, ab, fa):
         for i, edge in enumerate(elements)
     ]
     
-    a = open('network.txt', 'r').read()
+    a = open('stats/network.txt', 'r').read()
 
     nodes = ', '.join(nodes)
     edges = ', '.join(edges)
