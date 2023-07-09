@@ -6,6 +6,7 @@
         <title> PlantConnectome </title>
         <link rel = "stylesheet" type = 'text/css' href = "{{ url_for('static', filename = 'css/foundation.css') }}">  </link>
         <link rel = "stylesheet" type = 'text/css' href = "{{ url_for('static', filename = 'css/foundation.min.css') }}">  </link>
+        <link rel = "stylesheet" type = 'text/css' href = "{{ url_for('static', filename = 'css/header_icon.css') }}">  </link>
         <script src = " {{ url_for('static', filename = 'js/vendor/jquery.js') }}"> </script>
         <script src = " {{ url_for('static', filename = 'js/vendor/foundation.js') }}">  </script>
         <script src = " {{ url_for('static', filename = 'js/vendor/foundation.min.js') }}"> </script>
@@ -14,33 +15,19 @@
     </head>
     <body>
         {% block navbar %}
-        <div class="top-bar">
-            <div class="top-bar-left">
-                <ul class="menu">
-                    <li class="menu-text"> PlantConnectome </li>
-
-                    <style>
-                        .list-item {
-                        display: flex;
-                        align-items: center;
-                      }
-                    
-                      .list-item img {
-                        width: 30px; /* Adjust the width as per your needs */
-                        height: 30px; /* Adjust the height as per your needs */
-                        margin-right: 20px; /* Adjust the margin as per your needs */
-                      }
-                    </style>
-                    <li class="list-item"> <img src="/static/PC_icon.png"> </li>
-                    
+        <div class = "top-bar">
+            <div class = "top-bar-left">
+                <ul class = "menu">
+                    <li class = "menu-text"> PlantConnectome </li>
+                    <li class = "list-item"> <img src = "{{ url_for('static', filename = 'pics/favicon.ico') }}"> </li>
                     <li> <a href = "/"> Home </a> </li>
                     <li> <a href = "/catalogue"> Entities </a> </li>
                     <li> <a href = "/features"> Features </a> </li>
                     <li> <a href = "/help"> Help </a> </li>
                 </ul>
             </div>
-            <div class="top-bar-right">
-                <ul class="menu">
+            <div class = "top-bar-right">
+                <ul class = "menu">
                 </ul>
             </div>
         </div>
@@ -50,9 +37,9 @@
         {% block content %} {% endblock %}
 
         {% block footer %}
-        <article class="grid-container">
-            <div class="row border-box">
-                <ul class="menu align-center">
+        <article class = "grid-container">
+            <div class = "row border-box">
+                <ul class = "menu align-center">
                     <li class = 'menu-text'> PlantConnectome@2023 </li>
                     <li> <a href = "https://twitter.com/labmutwil" target = "_blank"> Follow us on Twitter </a></li>
                     <li> <a href = "https://discord.gg/qr8tYYHu7Y" target = "_blank"> Questions / suggestions? Let us know! </a> </li>
