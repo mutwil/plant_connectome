@@ -45,7 +45,7 @@ I left these routes here as they're trivial enough for now.
 
 @app.route('/', methods = ['GET'])
 def index():
-    v = open('stats.txt','r').read().rstrip().split()
+    v = open('stats/stats.txt','r').read().rstrip().split()
     return render_template('index.html', entities = v[1], papers = v[0])
 
 @app.route('/help', methods = ['GET'])
@@ -60,14 +60,14 @@ def features():
     '''
     Renders the features page.
     '''
-    journals, numbers = open('journal_statistics.txt','r').read().splitlines()
-    piechart = open('piechart.txt','r').read().replace('JOURNALS', journals).replace('NUMBERS', numbers)
+    journals, numbers = open('stats/journal_statistics.txt','r').read().splitlines()
+    piechart = open('stats/piechart.txt','r').read().replace('JOURNALS', journals).replace('NUMBERS', numbers)
     return render_template('features.html', piechart_code = piechart)
 
 # Fetches the favicon:
 @app.route('/favicon.ico', methods = ['GET'])
-def favicion():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype = 'image/vnd.microsoft.icon')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'pics/favicon.ico', mimetype = 'image/vnd.microsoft.icon')
 
 if __name__ == '__main__':
     app.run()
