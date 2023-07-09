@@ -1,0 +1,2 @@
+['Front Plant Sci', 'Plant Physiol', 'New Phytol', 'J Exp Bot', 'Plant J', 'BMC Plant Biol', 'Plant Cell', 'Plant Signal Behav', 'Planta', 'Plant Cell Physiol', 'J Plant Physiol', 'Plant Cell Environ', 'Plant Mol Biol', 'Physiol Plant', 'Int J Mol Sci', 'Mol Plant Microbe Interact', 'Mol Plant', 'PNAS', 'Nat Plants', 'J Integr Plant Biol', 'Other']
+[9999, 9683, 9672, 8616, 6717, 5553, 5532, 4424, 4268, 3648, 3625, 3527, 2625, 2556, 2511, 2483, 2377, 1845, 1820, 1766, 4993]

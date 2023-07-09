@@ -1,0 +1,445 @@
+function downloadAsPDF() {
+  // Assuming your Cytoscape instance is named 'cy'
+  const cy = document.getElementById('cy')._cyreg.cy;
+
+
+  // Register the SVG Exporter plugin
+  cytoscape.use(cytoscapeSvg);
+
+  // Export the network view as an SVG
+  const svgContent = cy.svg({ copyStyles: true, bg: 'white' });
+
+  // Convert the SVG to a PDF using the jsPDF library
+  const pdf = new jsPDF('l', 'pt', 'a4');
+  pdf.svg(svgContent, { x: 10, y: 10, width: 500, height: 300 }).then(() => {
+    pdf.save('network.pdf');
+  });
+}
+
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+  
+  const cy = document.getElementById('cy')._cyreg.cy;
+  const edges = cy.edges();
+  const edgeCounts = {};
+  const showOnlyTypes = new Set();
+  
+  // count number of edges for each type
+  edges.forEach(function(edge) {
+    const type = edge.data().interaction;
+    if (edgeCounts[type] === undefined) {
+      edgeCounts[type] = 0;
+    }
+    edgeCounts[type]++;
+  });
+  
+  // sort edge types by count
+	const sortedEdgeTypes = Object.keys(edgeCounts).sort(function(a, b) {
+	  return edgeCounts[b] - edgeCounts[a];
+	}).slice(0, 30);
+
+  const interactionDiv = document.getElementById('interaction');
+  interactionDiv.innerHTML = '';
+
+  // create checkboxes for each edge type
+  const numColumns = Math.ceil(sortedEdgeTypes.length / 15);
+  const numTypesPerColumn = Math.ceil(sortedEdgeTypes.length / numColumns);
+  let columnCounter = 0;
+  let typeCounter = 0;
+  let currentColumn;
+
+  sortedEdgeTypes.forEach(function(type) {
+    const label = document.createElement('label');
+    label.innerText = `${type} (${edgeCounts[type]})`;
+
+    const showOnlyCheckbox = document.createElement('input');
+    showOnlyCheckbox.type = 'checkbox';
+    showOnlyCheckbox.value = 'show-only';
+    showOnlyCheckbox.onclick = function() {
+      if (!showOnlyTypes.has(type)) {
+        showOnlyTypes.add(type);
+      } else {
+        showOnlyTypes.delete(type);
+      }
+      
+      updateEdges();
+    };
+
+    label.prepend(showOnlyCheckbox);
+
+    const interactionTypeDiv = document.createElement('div');
+    interactionTypeDiv.append(label);
+
+    if (typeCounter % numTypesPerColumn === 0) {
+      currentColumn = document.createElement('div');
+      currentColumn.style.float = 'left';
+      currentColumn.style.width = 'calc(100% / ' + numColumns + ')';
+      interactionDiv.appendChild(currentColumn);
+      columnCounter++;
+    }
+
+    currentColumn.appendChild(interactionTypeDiv);
+    typeCounter++;
+  });
+  
+  function updateEdges() {
+    const shownEdges = cy.edges().filter(function(edge) {
+      const type = edge.data().interaction;
+      return showOnlyTypes.size === 0 || showOnlyTypes.has(type);
+    });
+
+    const connectedNodes = new Set();
+    shownEdges.forEach(function(edge) {
+      connectedNodes.add(edge.source());
+      connectedNodes.add(edge.target());
+    });
+
+    cy.nodes().forEach(function(node) {
+      if (!connectedNodes.has(node)) {
+        node.hide();
+      } else {
+        node.show();
+      }
+    });
+
+    cy.edges().hide();
+    shownEdges.show();
+
+  }
+}
+
+// node actions
+function removeNode() {
+  removedEles = currentNode.remove();
+}
+
+function moveToEntity() {
+  var id = currentNode._private.data["id"];
+  const form = document.getElementById("gene-form");
+  const input = document.getElementById("gene_id");
+  input.value = id;
+  form.submit();
+}
+
+function isolateNeighborhood() {
+  removedEles.restore();
+  var neighborhood = currentNode.neighborhood().add(currentNode);
+  removedEles = cy.elements().difference(neighborhood).remove();
+  neighborhood.select();
+}
+
+// Global variable
+var currentNode;
+
+// so a href function call can access cy.
+const cy = cytoscape({
+	container: document.getElementById('cy'),
+    autoungrabify: true,
+    zoomingEnabled: true,
+    wheelSensitivity: 0.2,
+	elements: [
+	  // Nodes
+	  NODES,
+    
+	  // Edges
+	  EDGES
+	],
+
+	style: [
+	  {
+		selector: 'node',
+		style: {
+		  'background-color': '#6FB1FC', // Node background color
+		  'label': 'data(id)',
+		  'color': '#000000', // Node label text color
+		  'text-opacity': 1, // Node label text opacity (0-1)
+		  'font-size': '6px',
+		  'text-halign': 'center',
+		  'text-valign': 'center',
+		  'text-wrap': 'wrap',
+		  'text-max-width': 50
+		},
+	  },
+
+	  {
+		selector: 'edge',
+		style: {
+		  'width': 2,
+		  'line-color': '#A9A9A9', // Edge line color
+		  'curve-style': 'bezier', // Edge curve style
+		  'target-arrow-color': '#ccc',
+		  'target-arrow-shape': 'triangle',
+		  'curve-style': 'bezier',
+		  'label': 'data(interaction)',
+		  'font-size': '6px',
+		  'text-wrap': 'wrap', // Enable edge label text wrapping
+		  'text-max-width': 50, // Maximum edge label text width before wrapping (in pixels)
+		  'text-rotation': 'autorotate',
+		  'text-margin-x': '5px',
+		  'text-margin-y': '-5px'
+		},
+	  },
+	],
+
+	layout: {
+	  name: 'cose',
+		ready: function () {
+		  const layout = this;
+
+		  // Stop the layout after 2 seconds
+		  setTimeout(function () {
+			layout.stop();
+		  }, 20000);
+		}
+	}
+});
+
+var removedEles = cy.collection();
+
+
+// Add an event listener to the button to handle the click event
+document.querySelector(".open-button").addEventListener("click", openForm);
+
+
+// Add an event listener to the button to handle the click event
+// document.querySelector(".open-button").addEventListener("click", openForm);
+
+function closeForm() { document.getElementById("myForm").style.display = "none"; }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const tooltipAb = REPLACE_AB;
+  const tooltipFa = REPLACE_FA;
+  const tooltip =  document.getElementById('side-tooltip');
+  const ab = document.getElementById('ab');
+  const abTitle = document.getElementById('ab-title');
+  const fa = document.getElementById('fa');
+  const summaryText = document.getElementById("summaryText");
+  const summaryChildren = summaryText.children;
+  const copyOfSummaryText = summaryText.innerHTML;
+  var temp = summaryText.innerHTML.split("<div id=");
+  var removedTemp = [];
+  var removedTempCopy = [...removedTemp];
+  const header = temp[0];
+  const tempCopy = [...temp];
+  const tempLength = temp.length;
+  var removedNodes = [];
+  
+  cy.on('click', 'node', function(evt){
+    const prev = abTitle.innerHTML.split(":")[1].trim();
+    var node = evt.target;
+    var x = evt.renderedPosition.x;
+    var y = evt.renderedPosition.y;
+    var id = node._private.data["id"];
+    var neighborhood = node.neighborhood().add(node);
+    var nonNeighbors = cy.nodes().difference(neighborhood);
+    neighborhood.style('opacity', '1');
+    nonNeighbors.style('opacity', '0.5');
+    //Show the tooltip
+    if (tooltip.style.display === 'block' && id === prev) {
+      tooltip.style.display = 'none';
+      if (removedNodes.length !== 0) {
+        removedTemp = [...removedTempCopy];
+        for (var i=1; i<removedTemp.length; i++) removedTemp[i] = "<div id=" + removedTemp[i];
+        summaryText.innerHTML = removedTemp.join("");
+      } else {
+        summaryText.innerHTML = copyOfSummaryText;
+        temp = [...tempCopy];
+      }
+      cy.autoungrabify(false);
+      currentNode = null;
+    } else {
+      currentNode = node;
+      abTitle.innerHTML = 'Abbreviation: '+ id;
+      if (tooltipAb[id] === undefined) {
+          ab.innerHTML = "<p>No abbreviation found</p>";
+      } else {
+        ab.innerHTML = "";
+        if (tooltipAb[id].length < 11) {
+          tooltipAb[id].forEach(function(o) {
+            ab.innerHTML += "<li>" + o + "</li>";
+          });
+        } else {
+          tooltipAb[id].slice(0,10).forEach(function(o) {
+            ab.innerHTML += "<li>" + o + "</li>";
+          });
+          ab.innerHTML += "<li><u>(more descriptions found at the entity page)</u></li>";
+        }
+      }
+
+      if (tooltipFa[id] === undefined) {
+        fa.innerHTML = "<p>No functional annotation found</p>";
+      } else {
+        fa.innerHTML = "";
+        if (tooltipFa[id].length < 11) {
+          tooltipFa[id].forEach(function(o) {
+            fa.innerHTML += "<li>" + o + "</li>";
+          });
+        } else {
+          tooltipFa[id].slice(0,10).forEach(function(o) {
+            fa.innerHTML += "<li>" + o + "</li>";
+          });
+          fa.innerHTML += "<li><u>(more descriptions found at the entity page)</u></li>";
+        }
+      }
+      tooltip.style.display = 'block';
+      cy.autoungrabify(true);
+    }
+    if (removedNodes.length !== 0) {
+      removedTemp = [...removedTempCopy];
+      for (var i = 0; i < removedTempCopy.length; i++) {
+        if (!removedTempCopy[i].includes("data-source=\""+id+"\"") && !removedTempCopy[i].includes("data-target=\""+id+"\"")) {
+          removedTemp.splice(removedTemp.indexOf(removedTempCopy[i]),1);
+        }
+      }
+      if (removedTemp.length > 1) {
+        for (var i=0; i<removedTemp.length; i++) removedTemp[i] = "<div id=" + removedTemp[i];
+        summaryText.innerHTML = header + removedTemp.join("");
+      } else {
+        summaryText.innerHTML = header + "<div id=" + removedTemp;
+      }
+    } else {
+      temp = [...tempCopy];
+      for (var i = 0; i < tempCopy.length; i++) {
+        if (!tempCopy[i].includes("data-source=\""+id+"\"") && !tempCopy[i].includes("data-target=\""+id+"\"")) {
+          temp.splice(temp.indexOf(tempCopy[i]),1);
+        }
+      }
+      if (temp.length > 1) {
+        for (var i=0; i<temp.length; i++) temp[i] = "<div id=" + temp[i];
+        summaryText.innerHTML = header + temp.join("");
+      } else {
+        summaryText.innerHTML = header + "<div id=" + temp;
+      }
+    }
+  });
+
+  cy.on('dragpan', function(evt){
+    if( evt.target === cy ) {
+      tooltip.style.display = 'none';
+      if (removedNodes.length !== 0) {
+        removedTemp = [...removedTempCopy];
+        for (var i=1; i<removedTemp.length; i++) removedTemp[i] = "<div id=" + removedTemp[i];
+        summaryText.innerHTML = removedTemp.join("");
+      } else {
+        summaryText.innerHTML = copyOfSummaryText;
+        temp = [...tempCopy];
+      }
+      currentNode = null;
+    } 
+  });
+
+  cy.on('zoom', function(evt){
+    tooltip.style.display = 'none';
+    if (removedNodes.length !== 0) {
+      removedTemp = [...removedTempCopy];
+      for (var i=1; i<removedTemp.length; i++) removedTemp[i] = "<div id=" + removedTemp[i];
+      summaryText.innerHTML = removedTemp.join("");
+    } else {
+      summaryText.innerHTML = copyOfSummaryText;
+      temp = [...tempCopy];
+    }
+    currentNode = null;
+  });
+
+  cy.on('click', function(evt){
+    if( evt.target === cy ) {
+      cy.nodes().style('opacity', '1');
+      tooltip.style.display = 'none';
+      cy.autoungrabify(false);
+      if (removedNodes.length !== 0) {
+        removedTemp = [...removedTempCopy];
+        for (var i=1; i<removedTemp.length; i++) removedTemp[i] = "<div id=" + removedTemp[i];
+        summaryText.innerHTML = removedTemp.join("");
+      } else {
+        summaryText.innerHTML = copyOfSummaryText;
+        temp = [...tempCopy];
+      }
+      currentNode = null;
+    }
+  });
+
+  //cy.on('dblclick', 'node', function(evt){
+  //  var node = evt.target;
+  //  var neighborhood = node.neighborhood().add(node);
+  //  removedEles = cy.elements().difference(neighborhood).remove();
+  //  neighborhood.select();
+  //});
+
+  cy.on('dblclick', function(evt){
+    if(evt.target === cy) {
+      console.log("restore");
+      removedEles.restore();
+      removedNodes = [];
+      cy.nodes().style('opacity', '1');
+      tooltip.style.display = 'none';
+      summaryText.innerHTML = copyOfSummaryText;
+      temp = [...tempCopy];
+      currentNode = null;
+    }
+  });
+
+  cy.on('remove', 'node', function(evt) {
+    var node = evt.target;
+    temp = [...tempCopy];
+    const id = node._private.data["id"];
+    removedNodes.push(node);
+    for (var i = 0; i < tempLength; i++) {
+      for (var j = 0; j < removedNodes.length; j++) {
+        if (tempCopy[i].includes("data-source=\""+removedNodes[j]._private.data["id"]+"\"") || tempCopy[i].includes("data-target=\""+removedNodes[j]._private.data["id"]+"\"")) {
+          temp.splice(temp.indexOf(tempCopy[i]),1);
+          break;
+        }
+      }
+    }
+    removedTemp = [...temp];
+    removedTempCopy = [...removedTemp];
+    for (var i=1; i<temp.length; i++) temp[i] = "<div id=" + temp[i];
+    summaryText.innerHTML = temp.join("");
+    tooltip.style.display = 'none';
+    currentNode = null;
+  });
+
+  //cy.on('cxttap', 'node', function(evt){
+  //  var node = evt.target;
+  //  node.remove();
+  //});
+});
+
+/*
+elements = [
+	  // Nodes
+	  NODES,
+    
+	  // Edges
+	  EDGES
+	]
+
+elements.forEach(ele => {
+  if (ele.data.id.length === 0) console.log(ele)
+})
+*/
+
+function abFunction(ab) {
+  const form = document.getElementById("similarity-form");
+  const input = document.getElementById("similarity_id");
+  const type = document.getElementById("similarity_type");
+  input.value = ab;
+  type.value = "ab";
+  form.submit();
+}
+
+function faFunction(fa) {
+  const form = document.getElementById("similarity-form");
+  const input = document.getElementById("similarity_id");
+  const type = document.getElementById("similarity_type");
+  input.value = fa;
+  type.value = "fa";
+  form.submit();
+}
+
+function redirect(id) {
+  const form = document.getElementById("gene-form");
+  const input = document.getElementById("gene_id");
+  input.value = id;
+  form.submit();
+}
