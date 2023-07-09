@@ -25,7 +25,7 @@ def api_author(query):
 	text_sum, papers, count, elementsAb, elementsFa = '', 0, 0, [], []
 
 	if len(query):
-		papers, hits, forSending = pickle.load(open('authors', 'rb')), [], []
+		papers, hits, forSending = pickle.load(open('dbs/authors', 'rb')), [], []
 		for author in papers:
 			if len(set(query.split()) & set(author.lower().split())) == len(set(query.split())):
 				hits += papers[author]
@@ -37,7 +37,7 @@ def api_author(query):
 		count = record["Count"]
 
 		if len(hits):
-			genes, elements, papers = pickle.load(open('allDic2', 'rb')), [], []
+			genes, elements, papers = pickle.load(open('dbs/allDic2', 'rb')), [], []
 			for i in genes:
 				for j in genes[i]:
 					if j[3] in hits and len(j[0]) and len(j[2]):
@@ -47,7 +47,7 @@ def api_author(query):
 	
 	if len(forSending):
 		elements = list(set(elements))
-		fa, ab = pickle.load(open('fa', 'rb'))[0], pickle.load(open('abbreviations', 'rb'))[0]
+		fa, ab = pickle.load(open('dbs/fa', 'rb'))[0], pickle.load(open('dbs/abbreviations', 'rb'))[0]
 		elementsAb, elementsFa = make_abbreviations(ab, elements), make_functional_annotations(fa, elements)       
 		cytoscape_elements = generate_cytoscape_elements(process_network(elements))
 		text_sum = generate_summary_text(forSending)
@@ -69,11 +69,11 @@ def title_search(query):
 	text_sum, elementsAb, elementsFa = '', [], []
 
 	if len(pmids):
-		papers = pickle.load(open('titles', 'rb'))
+		papers = pickle.load(open('dbs/titles', 'rb'))
 		hits, forSending = list(set(pmids) & set(papers)), []
 
 		if len(hits):
-			genes, elements, papers = pickle.load(open('allDic2', 'rb')), [], []
+			genes, elements, papers = pickle.load(open('dbs/allDic2', 'rb')), [], []
 			for i in genes:
 				for j in genes[i]:
 					if j[3] in hits and len(j[0]) and len(j[2]):
@@ -83,7 +83,7 @@ def title_search(query):
 	
 		if len(forSending):
 			elements = list(set(elements))
-			fa, ab = pickle.load(open('fa', 'rb'))[0], pickle.load(open('abbreviations', 'rb'))[0]
+			fa, ab = pickle.load(open('dbs/fa', 'rb'))[0], pickle.load(open('dbs/abbreviations', 'rb'))[0]
 			elementsAb, elementsFa = make_abbreviations(ab, elements), make_functional_annotations(fa, elements)        
 			cytoscape_elements = generate_cytoscape_elements(process_network(elements))
 			text_sum = generate_summary_text(forSending)

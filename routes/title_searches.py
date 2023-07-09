@@ -28,14 +28,14 @@ def title_search(query):
     forSending = []
     if pmids != []:
 
-        with open('titles', 'rb') as title:
+        with open('dbs/titles', 'rb') as title:
             papers = pickle.load(title)
 
         hits = list(set(pmids) & set(papers))
         
         
         if hits!=[]:
-            with open('allDic2', 'rb') as file:
+            with open('dbs/allDic2', 'rb') as file:
                 genes = pickle.load(file)
             
             
@@ -49,7 +49,7 @@ def title_search(query):
                         break
     if forSending!=[]:
         elements = list(set(elements))
-        fa, ab = pickle.load(open('fa', 'rb'))[0], pickle.load(open('abbreviations', 'rb'))[0]
+        fa, ab = pickle.load(open('dbs/fa', 'rb'))[0], pickle.load(open('dbs/abbreviations', 'rb'))[0]
         elementsAb, elementsFa = make_abbreviations(ab, elements), make_functional_annotations(fa, elements)
 
         updatedElements = process_network(elements)
