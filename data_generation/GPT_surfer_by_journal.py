@@ -24,7 +24,7 @@ VERY SHORT, CONCISE SUMMARY CONTAINING ALL INFORMATION WITH TWO ACTORS PER LINE:
 
 '''
 
-openai.api_key = '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'
+openai.api_key = '<REDACTED>'
 path = 'D:/GPT_annotator'
 
 def gpt_analyzer(abstract):
