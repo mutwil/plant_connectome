@@ -12,6 +12,7 @@ sys.path.append('utils')
 from utils.search import Gene, make_abbreviations, make_functional_annotations
 from utils.cytoscape import process_network, generate_cytoscape_js
 from utils.text import make_text
+from utils.db import fetch_title_ids, fetch_entities_by_ids
 
 title_searches = Blueprint('title_searches', __name__)
 
@@ -21,36 +22,19 @@ def title_search(query):
         my_search = query
     except: 
         my_search = '26503768'
-    pmids = []
-    for i in my_search.split(';'):
-        pmids += i.split()
+    pmids = [i.strip() for i in my_search.split(';')]
             
     forSending = []
-    if pmids != []:
+    if len(pmids):
+        hits, elements = fetch_title_ids(pmids), []
+        results = fetch_entities_by_ids(hits)
+        for i in results:
+            forSending.append(Gene(i[0], i[2], i[1], i[3]))
+            elements.append((i[0].replace("'", "").replace('"', ''), i[2].replace("'", "").replace('"', ''), i[1].replace("'", "").replace('"', '')))    
 
-        with open('dbs/titles', 'rb') as title:
-            papers = pickle.load(title)
-
-        hits = list(set(pmids) & set(papers))
-        
-        
-        if hits!=[]:
-            with open('dbs/allDic2', 'rb') as file:
-                genes = pickle.load(file)
-            
-            
-            elements = [] 
-            for i in genes:
-                for j in genes[i]:
-                    if j[3] in hits:
-                        if j[0] != '' and j[2] != '':
-                            forSending.append(Gene(j[0], j[2], j[1], j[3])) #source, target, type 
-                            elements.append((j[0].replace("'", "").replace('"', ''), j[2].replace("'", "").replace('"', ''), j[1].replace("'", "").replace('"', '')))                
-                        break
     if forSending!=[]:
         elements = list(set(elements))
-        fa, ab = pickle.load(open('dbs/fa', 'rb'))[0], pickle.load(open('dbs/abbreviations', 'rb'))[0]
-        elementsAb, elementsFa = make_abbreviations(ab, elements), make_functional_annotations(fa, elements)
+        elementsAb, elementsFa = make_abbreviations(elements), make_functional_annotations(elements)
 
         updatedElements = process_network(elements)
         cytoscape_js_code = generate_cytoscape_js(updatedElements, elementsAb, elementsFa)

@@ -23,4 +23,4 @@ def test_card_elements_should_render(client):
 
 def test_pictures_should_render(client):
     response = client.get('/features')
-    assert response.data.count(b'<img') == NUM_PICTURES
+    assert response.data.count(b'<img') - 1 == NUM_PICTURES

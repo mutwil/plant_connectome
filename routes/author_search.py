@@ -13,26 +13,21 @@ sys.path.append('utils')
 from utils.search import Gene, make_abbreviations, make_functional_annotations
 from utils.cytoscape import process_network, generate_cytoscape_js
 from utils.text import make_text
+from utils.db import fetch_author_ids, fetch_entities_by_ids
 
 author_search = Blueprint('author_search', __name__)
 
 @author_search.route('/author/<query>', methods = ['GET'])
 def author(query):
     try:
-        my_search = query.lower()
+        my_search = query.lower().strip()
         replacements = {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss", "é": "e", "ô": "o", "î": "i", "ç": "c"}
         my_search = ''.join(replacements.get(c, c) for c in my_search)
     except:
         my_search = 'Marek Mutwil'.lower()
 
-    if my_search != '':
-        with open('dbs/authors', 'rb') as f:
-            # Load the object from the file
-            papers = pickle.load(f)
-        hits = []
-        for author in papers:      
-            if len(set(my_search.split()) & set(author.lower().split())) == len(set(my_search.split())):
-                hits += papers[author]
+    if len(my_search):
+        hits = fetch_author_ids(' '.join([i.strip() for i in my_search.split()]))
                     
         # provide your email address to the Entrez API
         Entrez.email = "mutwil@gmail.com"
@@ -46,24 +41,18 @@ def author(query):
         count = record["Count"]
         
         forSending = []
-        if hits != []:
-            with open('dbs/allDic2', 'rb') as file:
-                genes = pickle.load(file)
-            
-            elements = []
-            papers = []
-            for i in genes:
-                for j in genes[i]:
-                    if j[3] in hits:
-                        if j[0] != '' and j[2] != '':
-                            papers.append(j[3])
-                            forSending.append(Gene(j[0], j[2], j[1], j[3])) #source, target, type
-                            elements.append((j[0].replace("'", "").replace('"', ''),  j[2].replace("'", "").replace('"', ''), j[1].replace("'", "").replace('"', '')))                
-                        break
-    if forSending != []:
+        if len(hits):
+            queries, elements, papers = fetch_entities_by_ids(hits), [], []
+            papers = [i[-1] for i in queries]
+            for i in queries:
+                papers.append(i[-1])
+                forSending.append(Gene(i[0], i[2], i[1], i[3])) #source, target, type
+                elements.append((i[0].replace("'", "").replace('"', ''),  i[2].replace("'", "").replace('"', ''), i[1].replace("'", "").replace('"', ''))) 
+
+    if len(forSending):
         elements = list(set(elements))
-        fa, ab = pickle.load(open('dbs/fa', 'rb'))[0], pickle.load(open('dbs/abbreviations', 'rb'))[0]
-        elementsAb, elementsFa = make_abbreviations(ab, elements), make_functional_annotations(fa, elements)        
+        # fa, ab = pickle.load(open('dbs/fa', 'rb'))[0], pickle.load(open('dbs/abbreviations', 'rb'))[0]
+        elementsAb, elementsFa = make_abbreviations(elements), make_functional_annotations(elements)        
         updatedElements = process_network(elements)
         cytoscape_js_code = generate_cytoscape_js(updatedElements, elementsAb, elementsFa)
         warning = ''

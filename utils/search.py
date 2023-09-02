@@ -3,13 +3,14 @@ This module contains helper utilities to aid in searching (i.e., I've taken YS' 
 them in here so that it's easier to work with).
 '''
 import regex as re
-import pickle
 from flask import request, render_template
+from pymongo import MongoClient
 
 ## -- CUSTOM UTILITIES --
 from cytoscape import generate_cytoscape_js, process_network
 from text import make_text
 
+URL = 'mongodb://localhost:27017/'
 class Gene:    
     def __init__(self, id, description, inter_type, publication):
         self.id = id
@@ -38,88 +39,84 @@ def is_alphanumeric_helper(string, substring):
     
     return (len(matchesLeft) > 0) or (len(matchesRight) > 0)
 
-def find_terms_helper(gene, genes):
+def find_terms_helper(searches):
     '''
     Converts found terms to a Gene object (defined above)!
     '''
-    forSending = []
-    elements = []
-    for j in genes[gene]:
-        if j[0] != '' and j[2] != '':
-            forSending.append(Gene(j[0], j[2], j[1], j[3])) #source, target, type, pubmed ID
-            elements.append((j[0].replace("'", "").replace('"', ''), j[2].replace("'", "").replace('"', ''), 
-                             j[1].replace("'", "").replace('"', '')))
+    forSending, elements = [], []
+    for i in searches:
+        if len(i['entity1']) and len(i['entity2']):
+            forSending.append(Gene(i['entity1'], i['entity2'], i['edge'], i['pubmedID']))
+            elements.append((i['entity1'].replace("'", ''), i['entity2'].replace("'", ''), 
+                             i['edge'].replace("'", ''), i['pubmedID'].replace("'", '')))
     return elements, forSending
 
-def find_terms(my_search, genes, search_type):   
+def find_terms(my_search, search_type, url = 'mongodb://localhost:27017/'):   
     '''
     Given a search term, something to search (i.e., a pickled Python file), 
     and a search type, return the items that match the search query.
 
     This function is KEY to the searching functionality on the application!
     '''
+    client = MongoClient(url)
+    table = client.plant_connectome['all_dic']
     if not len(my_search):
         return None
     
     forSending, elements = [], []
     if search_type == 'exact':
-        for i in genes:
-            if my_search.upper().strip() == i.strip():
-                elements, forSending = find_terms_helper(i, genes)
+        results = table.find({'$or' : [{'entity1' : my_search.upper()}, {'entity2' : my_search.upper()}]})
+        elements, forSending = find_terms_helper(results)
     elif search_type == 'alias':
-        with open('dbs/geneAlias', 'rb') as file:
-            adjMat = pickle.load(file)
-        try:
-            terms = adjMat[my_search.upper().strip()]
-        except:
-            terms = []
+        alias_results, terms = list(client.plant_connectome['gene_alias'].find({'gene' : my_search.upper()})), []
+        for i in alias_results:
+            terms.extend(i['aliases']) 
         for i in terms:
-            for j in genes:
-                if i.upper().strip() in j.strip().split():
-                    outputOne, outputTwo = find_terms_helper(j, genes)
-                    elements.extend(outputOne)
-                    forSending.extend(outputTwo)
+            results = table.find({"$or" : [{'entity1' : {'$regex' : fr'\b{i.upper()}\b'}}, 
+                                       {'entity2' : {'$regex' : fr'\b{i.upper()}\b'}}]})
+            outputOne, outputTwo = find_terms_helper(results)
+            elements.extend(outputOne) ; forSending.extend(outputTwo)
     elif search_type == 'substring':
-        for i in genes:
-            if my_search.upper().strip() in i.strip():
-                outputOne, outputTwo = find_terms_helper(i, genes)
-                elements.extend(outputOne)
-                forSending.extend(outputTwo)
+        results = table.find({"$or" : [{'entity1' : {'$regex' : fr'\b{my_search.upper()}\b'}}, 
+                                       {'entity2' : {'$regex' : fr'\b{my_search.upper()}\b'}}]})
+        elements, forSending = find_terms_helper(results)
     elif search_type == 'non-alphanumeric':
-        for i in genes:
-            substring = my_search.upper().strip()
-            string = i.strip()
-            if substring in string:
-                if not is_alphanumeric_helper(string, substring):
-                    outputOne, outputTwo = find_terms_helper(i, genes)
-                    elements.extend(outputOne)
-                    forSending.extend(outputTwo)
+        results = list(table.find({"$or" : [{'entity1' : {'$regex' : fr'\b{my_search.upper()}\b'}}, 
+                                       {'entity2' : {'$regex' : fr'\b{my_search.upper()}\b'}}]}))
+        results_copy = results
+        for i in results_copy: 
+            if not is_alphanumeric_helper(i['entity1'], my_search.upper().strip()):
+                continue
+            if not is_alphanumeric_helper(i['entity2'], my_search.upper().strip()):
+                continue
+            results_copy.append(i)
+        elements, forSending = find_terms_helper(results_copy)
     elif search_type == 'default':                                                       # (i.e., default case)
-        for i in genes:
-            if my_search.upper().strip() in i.strip().split():  # default search - terms that contain the specific query word
-                outputOne, outputTwo = find_terms_helper(i, genes)
-                elements.extend(outputOne)
-                forSending.extend(outputTwo)
+        results = table.find({"$or" : [{'entity1' : {'$regex' : fr'\b{my_search.upper()}\b'}}, 
+                                       {'entity2' : {'$regex' : fr'\b{my_search.upper()}\b'}}]})
+        elements, forSending = find_terms_helper(results)
     else:
         raise Exception("An invalid 'search_type' parameter has been entered!")
+    
+    client.close()
     return list(set(elements)), forSending
 
-def make_abbreviations(abbreviations, elements):
-    ab = {}
-    for element in elements:
-        if abbreviations.get(element[0].upper()) is not None:
-            ab[element[0]] = abbreviations[element[0].upper()]
-        if abbreviations.get(element[1].upper()) is not None:
-            ab[element[1]] = abbreviations[element[1].upper()] 
+def make_abbreviations(elements, url = 'mongodb://localhost:27017/'):
+    client = MongoClient(url)
+    table = client.plant_connectome.abbr
+    results = [table.find({'$or' : [{'term' : i[0].upper()}, {'term' : i[1].upper()}]}) for 
+              i in elements]
+    ab = {j['term'] : j['abbs'] for i in results for j in i}
+    client.close()
     return ab
 
-def make_functional_annotations(gopredict, elements):
-    fa = {}
-    for element in elements:
-        if gopredict.get(element[0].upper()) is not None:
-            fa[element[0]] = gopredict[element[0].upper()]
-        if gopredict.get(element[1].upper()) is not None:
-            fa[element[1]] = gopredict[element[1].upper()]
+def make_functional_annotations(elements, url = 'mongodb://localhost:27017/'):
+    client = MongoClient(url)
+    table = client.plant_connectome.fa
+    results = [table.find({'$or' : [{'term' : i[0].upper()}, {'term' : i[1].upper()}]}) for 
+              i in elements]
+    fa = {j['term'] : j['abbs'] for i in results for j in i}
+    client.close()
     return fa
     
 def generate_search_route(search_type):
@@ -129,35 +126,22 @@ def generate_search_route(search_type):
     virtually similar to one another - a function factory keeps things DRY.
     '''
     def search_route(query):
-        try:
-            my_search = query
-        except:
-            my_search = 'cesa'
-        
-        forSending = []
-        if len(my_search) > 0:
-            split_search = my_search.split(';')
-            elements = []
-  
-            to_search = pickle.load(open('dbs/allDic2', 'rb'))
-            ab = pickle.load(open('dbs/abbreviations', 'rb'))[0]
-            fa = pickle.load(open('dbs/fa', 'rb'))[0]
+        forSending, my_search = [], query
 
+        if len(my_search) > 0:
+            split_search, elements = my_search.split(';'), []
             for term in split_search:
-                results = find_terms(term, to_search, search_type)
-                elements += results[0]
-                forSending += results[1]
+                results = find_terms(term, search_type)
+                elements += results[0] ; forSending += results[1]
                 
-            # remove redundancies
             elements = list(set(elements))
             
             warning = ''
             if len(elements) > 500:
-                warning = 'The network might be too large to be displayed, so click on "Layout Options",  select the edge types that you are interested in and click "Recalculate layout".'
+                warning = 'The network might be too large to be fully displayed.'
             
             updatedElements = process_network(elements)
-            elementsAb = make_abbreviations(ab, elements)
-            elementsFa = make_functional_annotations(fa, elements)
+            elementsAb, elementsFa = make_abbreviations(elements), make_functional_annotations(elements)
             cytoscape_js_code = generate_cytoscape_js(updatedElements, elementsAb, elementsFa)
             if elementsAb.get(my_search.upper()) is not None:
                 node_ab = elementsAb[my_search.upper()]

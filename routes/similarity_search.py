@@ -18,32 +18,31 @@ def similarity_form():
     try:
         query = request.form["similarity_id"]
         type = request.form["similarity_type"]
-
     except:
         query = ""
         type = ""
-    
     return redirect(url_for("similarity_search.similarity", query = query, type = type))
 
 
 @similarity_search.route('/similarity/<type>/<query>', methods = ['GET'])
 def similarity(query, type):
     forSending = []
-    if query != "" and type != "":
+    if len(query) and len(type):
         # search all the nodes with the same term
-        genes = pickle.load(open('dbs/allDic2', 'rb'))
+       #  genes = pickle.load(open('dbs/allDic2', 'rb'))
         if type == "ab":
-            f = pickle.load(open('dbs/abbreviations', 'rb'))
+            # f = pickle.load(open('dbs/abbreviations', 'rb'))
             typa = "abbreviation"
+        
         else:
-            f = pickle.load(open('dbs/fa', 'rb'))
+            # f = pickle.load(open('dbs/fa', 'rb'))
             typa = "functional annotation"
 
         for k, v in f[0].items():
             if query in v and k in f[1]:
                 forSending.append((k, f[1][k]))
 
-        unique_papers = []
+        unique_papers = list(set())
         for i in forSending:
             for v in i[1]:
                 if v not in unique_papers:

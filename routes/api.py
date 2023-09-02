@@ -83,8 +83,7 @@ def title_search(query):
 	
 		if len(forSending):
 			elements = list(set(elements))
-			fa, ab = pickle.load(open('dbs/fa', 'rb'))[0], pickle.load(open('dbs/abbreviations', 'rb'))[0]
-			elementsAb, elementsFa = make_abbreviations(ab, elements), make_functional_annotations(fa, elements)        
+			elementsAb, elementsFa = make_abbreviations(elements), make_functional_annotations(elements)        
 			cytoscape_elements = generate_cytoscape_elements(process_network(elements))
 			text_sum = generate_summary_text(forSending)
 

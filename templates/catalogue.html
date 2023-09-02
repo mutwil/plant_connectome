@@ -7,7 +7,8 @@
 {% block content %}
 <div class='grid-container align-center' style="padding-left: 2px; padding-right: 2px;">
   <br />
-  <h3 style="padding-top: 10px; padding-bottom: 10px;">This page contains the catalogue of all entities in the database. Click on the letter key to view all relevant entities</h3>
+  <h3 style="padding-top: 10px; padding-bottom: 10px;"> Entities </h3>
+  <p> This page contains the entities present inside PlantConnectome.  Click on one of the buttons below to view the entities that begin with the button's character. </p>
   <form action="{{ url_for('form', form_type = 'gene_id', search_type = 'exact') }}" method='POST' id='gene-form'>
     <input type="text" aria-describedby="searchfield1" id="gene_id" name='gene_id' style="display: none;">
   </form>
