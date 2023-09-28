@@ -5,10 +5,13 @@ them in here so that it's easier to work with).
 import regex as re
 import pickle
 from flask import request, render_template
+import time
+
 
 ## -- CUSTOM UTILITIES --
 from cytoscape import generate_cytoscape_js, process_network
 from text import make_text
+from utils.mongo import db
 
 class Gene:    
     def __init__(self, id, description, inter_type, publication):
@@ -39,6 +42,11 @@ def is_alphanumeric_helper(string, substring):
     return (len(matchesLeft) > 0) or (len(matchesRight) > 0)
 
 def find_terms_helper(gene, genes):
+    # mongo integration =>
+    forSending = []
+    elements = []
+    
+    # <= mongo integration
     '''
     Converts found terms to a Gene object (defined above)!
     '''
@@ -51,7 +59,7 @@ def find_terms_helper(gene, genes):
                              j[1].replace("'", "").replace('"', '')))
     return elements, forSending
 
-def find_terms(my_search, genes, search_type):   
+def find_terms(my_search, genes, search_type): 
     '''
     Given a search term, something to search (i.e., a pickled Python file), 
     and a search type, return the items that match the search query.
@@ -61,48 +69,180 @@ def find_terms(my_search, genes, search_type):
     if not len(my_search):
         return None
     
-    forSending, elements = [], []
+    print(my_search)
+    forSending, elements, elementsAb, elementsFa = [], [], {}, {}
     if search_type == 'exact':
-        for i in genes:
-            if my_search.upper().strip() == i.strip():
-                elements, forSending = find_terms_helper(i, genes)
+        function_start_time = time.time()
+        # mongo integration =>
+        results = genes.find(
+            {"$or": [{"entity1": {"$in": my_search}}, {"entity2": {"$in": my_search}}]})
+        loop_start_time = time.time()
+        for i in results:
+            forSending.append(
+                  Gene(i["entity1"], i["entity2"], i["edge"], i["pubmedID"]))
+            elements.append((i["entity1"],
+                                i["entity2"], i["edge"]))
+            if elementsAb.get(i["entity1"]) is None and len(i["entity1_abbs"]) > 0:
+                elementsAb[i["entity1"]] = i["entity1_abbs"]
+            if elementsFa.get(i["entity1"]) is None and len(i["entity1_fas"]) > 0:
+                elementsFa[i["entity1"]] = i["entity1_fas"]
+
+            if elementsAb.get(i["entity2"]) is None and len(i["entity2_abbs"]) > 0:
+                elementsAb[i["entity2"]] = i["entity2_abbs"]
+            if elementsFa.get(i["entity2"]) is None and len(i["entity2_fas"]) > 0:
+                elementsFa[i["entity2"]] = i["entity2_fas"]
+        # <= mongo integration
+        # for i in genes:
+        #     if my_search.upper().strip() == i.strip():
+        #         elements, forSending = find_terms_helper(i, genes)
     elif search_type == 'alias':
-        with open('geneAlias', 'rb') as file:
-            adjMat = pickle.load(file)
-        try:
-            terms = adjMat[my_search.upper().strip()]
-        except:
-            terms = []
-        for i in terms:
-            for j in genes:
-                if i.upper().strip() in j.strip().split():
-                    outputOne, outputTwo = find_terms_helper(j, genes)
-                    elements.extend(outputOne)
-                    forSending.extend(outputTwo)
+        function_start_time = time.time()
+
+        # mongo integration =>
+        geneAlias_collection = db["gene_alias"]
+        gas = geneAlias_collection.find({"gene": {"$in": my_search}})
+        gasList = [alias for ga in gas for alias in ga["aliases"]]
+        results = genes.find(
+            {"$or": [{"entity1": {"$in": gasList}}, {"entity2": {"$in": gasList}}]})
+        loop_start_time = time.time()
+        for i in results:
+            forSending.append(
+                Gene(i["entity1"], i["entity2"], i["edge"], i["pubmedID"]))
+            elements.append((i["entity1"],
+                             i["entity2"], i["edge"]))
+            if elementsAb.get(i["entity1"]) is None and len(i["entity1_abbs"]) > 0:
+                elementsAb[i["entity1"]] = i["entity1_abbs"]
+            if elementsFa.get(i["entity1"]) is None and len(i["entity1_fas"]) > 0:
+                elementsFa[i["entity1"]] = i["entity1_fas"]
+
+            if elementsAb.get(i["entity2"]) is None and len(i["entity2_abbs"]) > 0:
+                elementsAb[i["entity2"]] = i["entity2_abbs"]
+            if elementsFa.get(i["entity2"]) is None and len(i["entity2_fas"]) > 0:
+                elementsFa[i["entity2"]] = i["entity2_fas"]
+        # <= mongo integration
+        # with open('geneAlias', 'rb') as file:
+        #     adjMat = pickle.load(file)
+        # try:
+        #     terms = adjMat[my_search.upper().strip()]
+        # except:
+        #     terms = []
+        # for i in terms:
+        #     for j in genes:
+        #         if i.upper().strip() in j.strip().split():
+        #             outputOne, outputTwo = find_terms_helper(j, genes)
+        #             elements.extend(outputOne)
+        #             forSending.extend(outputTwo)
     elif search_type == 'substring':
-        for i in genes:
-            if my_search.upper().strip() in i.strip():
-                outputOne, outputTwo = find_terms_helper(i, genes)
-                elements.extend(outputOne)
-                forSending.extend(outputTwo)
+        function_start_time = time.time()
+
+        # mongo integration =>
+        patterns = [f'.*{re.escape(keyword)}.*' for keyword in my_search]
+        results = genes.find({
+            "$or": [
+                {"entity1": {"$regex": pattern, "$options": "i"}} for pattern in patterns
+            ] + [
+                {"entity2": {"$regex": pattern, "$options": "i"}} for pattern in patterns
+            ]
+        })
+        loop_start_time = time.time()
+        for i in results:
+            forSending.append(
+                Gene(i["entity1"], i["entity2"], i["edge"], i["pubmedID"]))
+            elements.append((i["entity1"],
+                             i["entity2"], i["edge"]))
+            if elementsAb.get(i["entity1"]) is None and len(i["entity1_abbs"]) > 0:
+                elementsAb[i["entity1"]] = i["entity1_abbs"]
+            if elementsFa.get(i["entity1"]) is None and len(i["entity1_fas"]) > 0:
+                elementsFa[i["entity1"]] = i["entity1_fas"]
+
+            if elementsAb.get(i["entity2"]) is None and len(i["entity2_abbs"]) > 0:
+                elementsAb[i["entity2"]] = i["entity2_abbs"]
+            if elementsFa.get(i["entity2"]) is None and len(i["entity2_fas"]) > 0:
+                elementsFa[i["entity2"]] = i["entity2_fas"]
+        # <= mongo integration
+        # for i in genes:
+        #     if my_search.upper().strip() in i.strip():
+        #         outputOne, outputTwo = find_terms_helper(i, genes)
+        #         elements.extend(outputOne)
+        #         forSending.extend(outputTwo)
     elif search_type == 'non-alphanumeric':
-        for i in genes:
-            substring = my_search.upper().strip()
-            string = i.strip()
-            if substring in string:
-                if not is_alphanumeric_helper(string, substring):
-                    outputOne, outputTwo = find_terms_helper(i, genes)
-                    elements.extend(outputOne)
-                    forSending.extend(outputTwo)
+        function_start_time = time.time()
+
+        # mongo integration =>
+        patterns = [f'^{re.escape(name)}[^a-zA-Z0-9]' for name in my_search]
+        results = genes.find({
+            "$or": [
+                {"entity1": {"$regex": pattern, "$options": "i"}} for pattern in patterns
+            ] + [
+                {"entity2": {"$regex": pattern, "$options": "i"}} for pattern in patterns
+            ]
+        })
+        loop_start_time = time.time()
+        for i in results:
+            forSending.append(
+                Gene(i["entity1"], i["entity2"], i["edge"], i["pubmedID"]))
+            elements.append((i["entity1"],
+                             i["entity2"], i["edge"]))
+            if elementsAb.get(i["entity1"]) is None and len(i["entity1_abbs"]) > 0:
+                elementsAb[i["entity1"]] = i["entity1_abbs"]
+            if elementsFa.get(i["entity1"]) is None and len(i["entity1_fas"]) > 0:
+                elementsFa[i["entity1"]] = i["entity1_fas"]
+
+            if elementsAb.get(i["entity2"]) is None and len(i["entity2_abbs"]) > 0:
+                elementsAb[i["entity2"]] = i["entity2_abbs"]
+            if elementsFa.get(i["entity2"]) is None and len(i["entity2_fas"]) > 0:
+                elementsFa[i["entity2"]] = i["entity2_fas"]
+        # <= mongo integration
+        # for i in genes:
+        #     substring = my_search.upper().strip()
+        #     string = i.strip()
+        #     if substring in string:
+        #         if not is_alphanumeric_helper(string, substring):
+        #             outputOne, outputTwo = find_terms_helper(i, genes)
+        #             elements.extend(outputOne)
+        #             forSending.extend(outputTwo)
     elif search_type == 'default':                                                       # (i.e., default case)
-        for i in genes:
-            if my_search.upper().strip() in i.strip().split():  # default search - terms that contain the specific query word
-                outputOne, outputTwo = find_terms_helper(i, genes)
-                elements.extend(outputOne)
-                forSending.extend(outputTwo)
+        # mongo integration =>
+        function_start_time = time.time()
+
+        patterns = [fr'.*\b{re.escape(word)}\b.*' for key in my_search for word in key.split()]
+        results = genes.find({
+            "$or": [
+                {"entity1": {"$regex": pattern, "$options": "i"}} for pattern in patterns
+            ] + [
+                {"entity2": {"$regex": pattern, "$options": "i"}} for pattern in patterns
+            ]
+        })
+        loop_start_time = time.time()
+        for i in results:
+            forSending.append(
+                Gene(i["entity1"], i["entity2"], i["edge"], i["pubmedID"]))
+            elements.append((i["entity1"],
+                             i["entity2"], i["edge"]))
+            if elementsAb.get(i["entity1"]) is None and len(i["entity1_abbs"]) > 0:
+                elementsAb[i["entity1"]] = i["entity1_abbs"]
+            if elementsFa.get(i["entity1"]) is None and len(i["entity1_fas"]) > 0:
+                elementsFa[i["entity1"]] = i["entity1_fas"]
+
+            if elementsAb.get(i["entity2"]) is None and len(i["entity2_abbs"]) > 0:
+                elementsAb[i["entity2"]] = i["entity2_abbs"]
+            if elementsFa.get(i["entity2"]) is None and len(i["entity2_fas"]) > 0:
+                elementsFa[i["entity2"]] = i["entity2_fas"]
+        # <= mongo integration
+        # for i in genes:
+        #     if my_search.upper().strip() in i.strip().split():  # default search - terms that contain the specific query word
+        #         outputOne, outputTwo = find_terms_helper(i, genes)
+        #         elements.extend(outputOne)
+        #         forSending.extend(outputTwo)
     else:
         raise Exception("An invalid 'search_type' parameter has been entered!")
-    return list(set(elements)), forSending
+    end_time = time.time()
+    function_elapsed_time = end_time - function_start_time
+    loop_elapsed_time = end_time - loop_start_time
+    print(f"Function Elapsed time: {function_elapsed_time} seconds")
+    print(f"Loop Elapsed time: {loop_elapsed_time} seconds")
+
+    return list(set(elements)), forSending, elementsAb, elementsFa
 
 def make_abbreviations(abbreviations, elements):
     ab = {}
@@ -137,27 +277,35 @@ def generate_search_route(search_type):
         forSending = []
         if len(my_search) > 0:
             split_search = my_search.split(';')
+            trimmed_search = [keyword.strip() for keyword in split_search]
             elements = []
-  
-            to_search = pickle.load(open('allDic2', 'rb'))
-            ab = pickle.load(open('abbreviations', 'rb'))[0]
-            fa = pickle.load(open('fa', 'rb'))[0]
+# mongo integration =>
+            all_dic_collection = db["all_dic"]
+            elements, forSending, elementsAb, elementsFa = find_terms(
+                trimmed_search, all_dic_collection, search_type)
 
-            for term in split_search:
-                results = find_terms(term, to_search, search_type)
-                elements += results[0]
-                forSending += results[1]
+# <= mongo integration
+
+  
+            # to_search = pickle.load(open('allDic2', 'rb'))
+            # ab = pickle.load(open('abbreviations', 'rb'))[0]
+            # fa = pickle.load(open('fa', 'rb'))[0]
+
+            # for term in split_search:
+            #     results = find_terms(term, to_search, search_type)
+            #     elements += results[0]
+            #     forSending += results[1]
                 
-            # remove redundancies
-            elements = list(set(elements))
+            # # remove redundancies
+            # elements = list(set(elements))
             
             warning = ''
             if len(elements) > 500:
                 warning = 'The network might be too large to be displayed, so click on "Layout Options",  select the edge types that you are interested in and click "Recalculate layout".'
             
             updatedElements = process_network(elements)
-            elementsAb = make_abbreviations(ab, elements)
-            elementsFa = make_functional_annotations(fa, elements)
+            # elementsAb = make_abbreviations(ab, elements)
+            # elementsFa = make_functional_annotations(fa, elements)
             cytoscape_js_code = generate_cytoscape_js(updatedElements, elementsAb, elementsFa)
             if elementsAb.get(my_search.upper()) is not None:
                 node_ab = elementsAb[my_search.upper()]
